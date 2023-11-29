@@ -16,12 +16,14 @@ import static java.util.Calendar.YEAR;
 public class CardDeliverySelenideTest {
 
 
-    Calendar cal = new Calendar.Builder().setCalendarType("japanese")
-            .setFields(YEAR, 1, DAY_OF_YEAR, 1).build();
-
+    
     @Test
     void shouldSubmitForm() throws InterruptedException {
         open("http://localhost:9999");
+
+        Calendar cal = new Calendar.Builder().setCalendarType("japanese")
+            .setFields(YEAR, 1, DAY_OF_YEAR, 1).build();
+
 
         $("[data-test-id=city] input").setValue("Новосибирск");
         $("[data-test-id=date] input").sendKeys(cal.getCalendarType());
