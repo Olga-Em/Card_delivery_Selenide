@@ -1,8 +1,12 @@
 package ru.netology.test;
 
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -15,21 +19,24 @@ import static java.util.Calendar.YEAR;
 
 public class CardDeliverySelenideTest {
 
-
-    Calendar cal = new Calendar.Builder().setCalendarType("japanese")
-            .setFields(YEAR, 1, DAY_OF_YEAR, 1).build();
-
+    public String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
     @Test
-    void shouldSubmitForm() throws InterruptedException {
+    void shouldSubmitForm() {
         open("http://localhost:9999");
 
+        String planningDate = generateDate(4);
+
         $("[data-test-id=city] input").setValue("Новосибирск");
-        $("[data-test-id=date] input").sendKeys(cal.getCalendarType());
+        $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id=name] input").setValue("Эм Ольга");
         $("[data-test-id=phone] input").setValue("+79140000015");
         $("[data-test-id=agreement]").click();
         $(byText("Забронировать")).click();
-        $(withText("Встреча успешно забронирована на")).shouldBe((visible), Duration.ofSeconds(15));
-        Thread.sleep(5000);
+        $(".notification__content")
+                .shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
     }
 }
